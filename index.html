@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="VOGUE - Premium Fashion Store. Discover luxury clothing, accessories, and exclusive collections from top brands.">
+    <title>VOGUE | Premium Fashion Store</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1380",
+                        "background-light": "#f8f6f7",
+                        "background-dark": "#221019",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body
+    class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased selection:bg-primary selection:text-white transition-colors duration-300 overflow-hidden"
+    id="body">
+
+    <!-- Cinematic Splash Screen -->
+    <div id="splashScreen" class="fixed inset-0 z-[100] bg-white dark:bg-slate-900 flex items-center justify-center">
+        <div class="text-6xl md:text-8xl font-serif font-bold tracking-widest flex overflow-hidden">
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block transition-all duration-700 ease-out">V</span>
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block transition-all duration-700 ease-out delay-100">O</span>
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block transition-all duration-700 ease-out delay-200">G</span>
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block transition-all duration-700 ease-out delay-300">U</span>
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block transition-all duration-700 ease-out delay-400">E</span>
+            <span
+                class="splash-letter translate-y-full opacity-0 inline-block text-primary transition-all duration-700 ease-out delay-500">.</span>
+        </div>
+    </div>
+
+    <!-- Header (Initially Hidden opacity-0) -->
+    <header id="mainHeader"
+        class="fixed w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all duration-1000 opacity-0 -translate-y-full">
+        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+
+            <!-- Logo -->
+            <a href="index.html"
+                class="flex-shrink-0 text-3xl font-serif font-bold tracking-tight dark:text-white transition-opacity duration-500 delay-500"
+                id="headerLogo">
+                VOGUE<span class="text-primary text-4xl">.</span>
+            </a>
+
+            <!-- Search Bar (Centered) -->
+            <div class="hidden md:flex flex-1 max-w-lg mx-8 relative group">
+                <input type="text" id="searchInput"
+                    class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+                    placeholder="Search for luxury items...">
+                <span
+                    class="material-icons absolute left-4 top-2.5 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+            </div>
+
+            <!-- Icons (Right) -->
+            <div class="flex items-center space-x-6">
+                <button id="darkModeToggle"
+                    class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"
+                    title="Toggle Theme">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+
+                <button id="accountBtn" class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"
+                    title="Login / Account">
+                    <span class="material-icons">person_outline</span>
+                </button>
+
+                <!-- Mobile Search Toggle -->
+                <button class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors block md:hidden">
+                    <span class="material-icons">search</span>
+                </button>
+
+                <!-- Wishlist -->
+                <a href="#" id="wishlistBtn"
+                    class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors relative"
+                    title="Wishlist">
+                    <span class="material-icons">favorite_border</span>
+                    <span id="wishlistCount"
+                        class="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold hidden">0</span>
+                </a>
+
+                <!-- Cart -->
+                <div class="relative group">
+                    <button id="cartBtn" class="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"
+                        title="View Cart">
+                        <span class="material-icons">shopping_bag</span>
+                    </button>
+                    <span id="cartCount"
+                        class="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub Navigation -->
+        <nav class="border-t border-slate-100 dark:border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <ul
+                    class="flex justify-center space-x-12 py-4 text-sm font-medium tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+                    <li><a class="hover:text-primary border-b-2 border-transparent hover:border-primary pb-4 transition-all"
+                            href="#new-arrivals">New Arrivals</a></li>
+                    <li><a class="text-slate-900 dark:text-white border-b-2 border-primary pb-4 transition-all"
+                            href="#clothing">Clothing</a></li>
+                    <li><a class="hover:text-primary border-b-2 border-transparent hover:border-primary pb-4 transition-all"
+                            href="#accessories">Accessories</a></li>
+                    <li><a class="text-primary border-b-2 border-transparent hover:border-primary pb-4 transition-all"
+                            href="#sale">Sale</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Product Grid (Full Width) -->
+        <div class="w-full">
+            <!-- Toolbar (Sort & Count) -->
+            <div
+                class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-6 border-b border-slate-100 dark:border-slate-800">
+                <p class="text-sm text-slate-500 mb-4 sm:mb-0">Showing <span id="productCount"
+                        class="font-bold text-slate-900 dark:text-white">0</span> exclusive items</p>
+
+                <div class="flex items-center space-x-4">
+                    <select id="sortSelect"
+                        class="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer">
+                        <option value="popularity">Most Popular</option>
+                        <option value="newest">New Arrivals</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <!-- Changed form 3 cols to 4 cols for full width -->
+            <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+                <!-- Products injected by JS -->
+            </div>
+
+            <!-- Load More -->
+            <div class="mt-16 text-center">
+                <button id="loadMoreBtn"
+                    class="inline-flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-slate-900 dark:text-white hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1">
+                    <span>Load More Products</span>
+                    <span class="material-icons text-lg">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+        <h4 class="text-xs font-bold uppercase tracking-widest mb-6">Legal</h4>
+        <ul class="space-y-4 text-sm text-slate-500">
+            <li><a class="hover:text-primary transition-colors" href="#privacy">Privacy Policy</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#terms">Terms of Service</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#cookies">Cookie Policy</a></li>
+        </ul>
+    </main>
+
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-8 right-8 z-50">
+        <button id="floatingCartBtn"
+            class="flex items-center justify-center w-16 h-16 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full shadow-2xl border border-slate-100 dark:border-slate-700 group relative hover:scale-110 transition-transform">
+            <span class="material-icons">shopping_cart</span>
+            <span id="floatingCartCount"
+                class="absolute -top-1 -right-1 flex items-center justify-center w-6 h-6 bg-primary text-white text-[11px] font-bold rounded-full">0</span>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest mb-6">Customer Care</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a class="hover:text-primary transition-colors" href="#contact">Contact Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#shipping">Shipping & Returns</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#size-guide">Size Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest mb-6">About Vogue</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a class="hover:text-primary transition-colors" href="#story">Our Story</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#careers">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#sustainability">Sustainability</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest mb-6">Legal</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a class="hover:text-primary transition-colors" href="#privacy">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#terms">Terms of Service</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#cookies">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest mb-6">Newsletter</h4>
+                    <div class="mt-4">
+                        <form id="newsletterForm" class="flex">
+                            <input
+                                class="w-full px-4 py-2 border-slate-200 dark:border-slate-800 bg-transparent rounded-l-lg focus:ring-primary focus:border-primary text-sm"
+                                placeholder="Email Address" type="email" required />
+                            <button type="submit"
+                                class="px-4 py-2 bg-slate-900 dark:bg-primary text-white rounded-r-lg text-sm font-bold uppercase hover:bg-primary dark:hover:bg-primary/80 transition-colors">Join</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="flex flex-col md:flex-row justify-between items-center border-t border-slate-100 dark:border-slate-800 pt-8">
+                <p class="text-xs text-slate-400">© 2024 VOGUE Premium Store. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <span class="text-xs text-slate-400">We accept:</span>
+                    <span class="text-xs text-slate-600 dark:text-slate-400">Visa • Mastercard • PayPal • Amex</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div
+                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100 dark:border-slate-700">
+
+                <div class="px-6 py-8">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome to VOGUE</h3>
+                        <p class="text-slate-500 text-sm">Sign in to access your wishlist, cart, and exclusive offers.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <button id="googleLoginBtn"
+                            class="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"
+                                class="h-5 w-5">
+                            Continue with Google
+                        </button>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button id="closeModalBtn"
+                            class="text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                            Maybe later
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script type="module" src="js/app.js?v=1.1"></script>
+
+</body>
+
+</html>
