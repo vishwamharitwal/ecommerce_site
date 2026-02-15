@@ -262,6 +262,11 @@ window.addToCart = function () {
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartBadge();
     showToast(`${product.name} added to cart!`, 'success');
+
+    // Redirect to Cart Page after short delay
+    setTimeout(() => {
+        window.location.href = 'cart.html';
+    }, 1000);
 };
 
 function updateCartBadge() {
