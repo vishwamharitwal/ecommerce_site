@@ -4,6 +4,7 @@
 
 import { loginWithGoogle, logoutUser, monitorAuthState } from './auth.js';
 import { fetchProducts, seedProducts, syncUserData, fetchUserData } from './db.js';
+import { sanitizeCart } from './utils.js';
 
 // Initial Product Data (For Seeding)
 const initialProducts = [
@@ -113,7 +114,7 @@ let products = [];
 
 // State Management (SAFE localStorage access)
 let currentUser = null;
-let cart = safeGetLocalStorage('cart', []);
+let cart = sanitizeCart(safeGetLocalStorage('cart', []));
 let wishlist = safeGetLocalStorage('wishlist', []);
 let filters = {
     category: null,
@@ -184,13 +185,8 @@ async function loadUserData(userId) {
         if (userData) {
             // Merge cloud data with local data
             if (userData.cart && userData.cart.length > 0) {
-                // Ghost Product Cleaner (Robust)
-                cart = userData.cart.filter(item => {
-                    const name = (item.name || "").toLowerCase();
-                    const isGhost = name.includes("rk test") || name.includes("test product");
-                    const isValid = !isGhost && item.price !== undefined && item.name;
-                    return isValid;
-                });
+                // Ghost Product Cleaner (Robust via Utils)
+                cart = sanitizeCart(userData.cart);
 
                 safeSetLocalStorage('cart', cart);
                 updateCartCount();

@@ -1,6 +1,7 @@
 
 import { auth, onAuthStateChanged } from './firebase-config.js';
 import { syncUserData } from './db.js';
+import { sanitizeCart } from './utils.js';
 
 // ==========================================
 // CART PAGE LOGIC
@@ -33,17 +34,9 @@ function loadCart() {
         cart = [];
     }
 
-    // --- FIX ISSUE 1: REMOVE GHOST PRODUCTS (ROBUST) ---
+    // --- FIX ISSUE 1: REMOVE GHOST PRODUCTS (ROBUST via Utils) ---
     const initialLength = cart.length;
-    cart = cart.filter(item => {
-        const name = (item.name || "").toLowerCase();
-        const isGhost = name.includes("rk test") || name.includes("test product");
-        // Ensure price is a number if possible
-        if (typeof item.price === 'string') item.price = parseFloat(item.price);
-
-        const isValid = !isGhost && !isNaN(item.price) && item.name;
-        return isValid;
-    });
+    cart = sanitizeCart(cart);
 
     if (cart.length !== initialLength) {
         console.warn("🧹 Cleaned up invalid/ghost items from cart.");
