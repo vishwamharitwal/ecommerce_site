@@ -4,7 +4,7 @@
 
 import { loginWithGoogle, logoutUser, monitorAuthState } from './auth.js';
 import { fetchProducts, seedProducts, syncUserData, fetchUserData } from './db.js';
-import { sanitizeCart } from './utils.js';
+import { sanitizeCart, mergeCarts } from './utils.js';
 
 // Initial Product Data (For Seeding)
 const initialProducts = [
@@ -186,16 +186,19 @@ async function loadUserData(userId) {
             // Merge cloud data with local data
             if (userData.cart && userData.cart.length > 0) {
                 // Ghost Product Cleaner (Robust via Utils)
-                cart = sanitizeCart(userData.cart);
+                const cloudCart = sanitizeCart(userData.cart);
 
+                // MERGE STRATEGY (Backend Agent Logic)
+                // Combine Local + Cloud to prevent data loss or overwrite
+                const mergedCart = mergeCarts(cart, cloudCart);
+
+                cart = mergedCart;
                 safeSetLocalStorage('cart', cart);
                 updateCartCount();
 
-                // If cleaner ran, sync back to cloud immediately
-                if (cart.length !== userData.cart.length) {
-                    console.warn("🧹 Cleaned ghost items from Cloud Cart");
-                    syncUserData(userId, 'cart', cart);
-                }
+                // Force Sync Merged Result to Cloud (Single Source of Truth)
+                console.log("🧩 Merged Local & Cloud Carts");
+                syncUserData(userId, 'cart', cart);
             }
             if (userData.wishlist && userData.wishlist.length > 0) {
                 wishlist = userData.wishlist;

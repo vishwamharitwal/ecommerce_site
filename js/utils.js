@@ -39,3 +39,32 @@ export function sanitizeCart(cart) {
         return isValid;
     });
 }
+
+/**
+ * Merges Local and Cloud carts intelligently.
+ * Uses Max Quantity logic to avoid double counting on sync.
+ * keys: id + size + color
+ */
+export function mergeCarts(localCart, cloudCart) {
+    if (!Array.isArray(localCart)) localCart = [];
+    if (!Array.isArray(cloudCart)) cloudCart = [];
+
+    // Composite Key Generator
+    const getKey = (item) => `${item.id}-${item.selectedSize || 'Def'}-${item.selectedColor || 'Def'}`;
+
+    const mergedMap = new Map();
+
+    // Process both lists (Cloud first, then Local overwrites if needed? No, merge)
+    [...cloudCart, ...localCart].forEach(item => {
+        const key = getKey(item);
+        if (mergedMap.has(key)) {
+            const existing = mergedMap.get(key);
+            // Use MAX quantity to avoid double counting same item
+            existing.quantity = Math.max(existing.quantity, item.quantity);
+        } else {
+            mergedMap.set(key, { ...item });
+        }
+    });
+
+    return Array.from(mergedMap.values());
+}

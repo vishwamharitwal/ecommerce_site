@@ -185,102 +185,97 @@ window.selectSize = (el, size) => {
 
 // Cart Logic
 window.addToCart = async function () {
-    console.log("Add to Cart Clicked");
-    console.log("Current User:", currentUser);
-    console.log("Product:", product);
-    console.log("Selected Size:", selectedSize);
-    console.log("Selected Color:", selectedColor);
+    const btn = document.getElementById('addToCartBtn');
+    const originalText = btn ? btn.innerHTML : 'ADD TO CART';
 
-    if (!currentUser) {
-        showToast('Please login to continue shopping', 'error');
-        // prompt login
-        const logicPrompt = document.getElementById('loginPromptBox');
-        if (logicPrompt) logicPrompt.scrollIntoView({ behavior: 'smooth' });
-        return;
+    if (btn) {
+        btn.innerHTML = '<span class="material-icons animate-spin text-sm mr-2">refresh</span> Adding...';
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
     }
 
-    if (!product) {
-        console.error("Product object is null/undefined during addToCart call");
-        showToast('Still loading product details... please wait', 'info');
-        return;
-    }
+    try {
+        console.log("Add to Cart Clicked");
+        console.log("Current User:", currentUser);
 
-    // Auto-select first options if not selected (UX Improvement)
-    if (!selectedSize && product.sizes && product.sizes.length > 0) {
-        selectedSize = product.sizes[0];
-        console.log("Auto-selected size:", selectedSize);
-
-        // Visually select it
-        const sizeBtns = document.querySelectorAll('.size-option');
-        if (sizeBtns.length > 0) {
-            sizeBtns[0].classList.add('bg-primary', 'text-white', 'border-primary');
+        if (!currentUser) {
+            showToast('Please login to continue shopping', 'error');
+            const logicPrompt = document.getElementById('loginPromptBox');
+            if (logicPrompt) logicPrompt.scrollIntoView({ behavior: 'smooth' });
+            throw new Error("User not logged in");
         }
-    }
 
-    if (!selectedColor && (product.colors || product.color)) {
-        const colors = product.colors || [product.color];
-        if (colors.length > 0) selectedColor = colors[0];
-        console.log("Auto-selected color:", selectedColor);
-
-        // Visually select it
-        const colorBtns = document.querySelectorAll('.color-option');
-        if (colorBtns.length > 0) {
-            colorBtns[0].classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+        if (!product) {
+            showToast('Still loading product details... please wait', 'info');
+            throw new Error("Product details missing");
         }
-    }
 
+        // Auto-select first options if not selected
+        if (!selectedSize && product.sizes && product.sizes.length > 0) {
+            selectedSize = product.sizes[0];
+            const sizeBtns = document.querySelectorAll('.size-option');
+            if (sizeBtns.length > 0) sizeBtns[0].classList.add('bg-primary', 'text-white', 'border-primary');
+        }
 
-    if (!selectedSize) {
-        showToast('Please select a size', 'error');
-        return;
-    }
+        if (!selectedColor && (product.colors || product.color)) {
+            const colors = product.colors || [product.color];
+            if (colors.length > 0) selectedColor = colors[0];
+            const colorBtns = document.querySelectorAll('.color-option');
+            if (colorBtns.length > 0) colorBtns[0].classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+        }
 
-    // Explicit quantity (using window.qty from HTML script or default)
-    const qtyDisplay = document.getElementById('qtyDisplay');
-    let quantity = 1;
-    if (qtyDisplay) {
-        quantity = parseInt(qtyDisplay.innerText);
-    }
-    if (isNaN(quantity) || quantity < 1) quantity = 1;
+        if (!selectedSize) {
+            showToast('Please select a size', 'error');
+            throw new Error("Size not selected");
+        }
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        // Quantity
+        const qtyDisplay = document.getElementById('qtyDisplay');
+        let quantity = 1;
+        if (qtyDisplay) quantity = parseInt(qtyDisplay.innerText);
+        if (isNaN(quantity) || quantity < 1) quantity = 1;
 
-    const existingItem = cart.find(item => item.id == product.id && item.selectedSize == selectedSize && item.selectedColor == selectedColor);
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingItem = cart.find(item => item.id == product.id && item.selectedSize == selectedSize && item.selectedColor == selectedColor);
 
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            selectedSize: selectedSize || (product.sizes ? product.sizes[0] : 'One Size'),
-            selectedColor: selectedColor || (product.colors ? product.colors[0] : 'Default'),
-            quantity: quantity
-        });
-    }
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                selectedSize: selectedSize || (product.sizes ? product.sizes[0] : 'One Size'),
+                selectedColor: selectedColor || (product.colors ? product.colors[0] : 'Default'),
+                quantity: quantity
+            });
+        }
 
-    // Sanitize before saving (Backend Agent Logic)
-    cart = sanitizeCart(cart);
+        // Sanitize & Save
+        cart = sanitizeCart(cart);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`${product.name} added to cart!`, 'success');
 
-    // Save Local
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartBadge();
-    showToast(`${product.name} added to cart!`, 'success');
-
-    // FORCE SYNC TO CLOUD (Critical Fix - Await Sync)
-    if (currentUser) {
-        try {
+        // FORCE SYNC (Await)
+        if (currentUser) {
             await syncUserData(currentUser.uid, 'cart', cart);
             console.log('☁️ Cart synced successfully');
-        } catch (err) {
-            console.error('Sync failed:', err);
+        }
+
+        // Redirect
+        window.location.href = 'cart.html';
+
+    } catch (error) {
+        console.warn("Add to Cart Stopped:", error.message);
+        // Only revert button if NOT redirecting (implied by error)
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
         }
     }
-
-    // Redirect to Cart Page
-    window.location.href = 'cart.html';
 };
 
 function updateCartBadge() {
