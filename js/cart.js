@@ -33,11 +33,15 @@ function loadCart() {
         cart = [];
     }
 
-    // --- FIX ISSUE 1: REMOVE GHOST PRODUCTS ---
+    // --- FIX ISSUE 1: REMOVE GHOST PRODUCTS (ROBUST) ---
     const initialLength = cart.length;
     cart = cart.filter(item => {
-        // Remove "RK Test Product" or any item without valid price/name
-        const isValid = item.name !== "RK Test Product" && item.price >= 0 && item.name;
+        const name = (item.name || "").toLowerCase();
+        const isGhost = name.includes("rk test") || name.includes("test product");
+        // Ensure price is a number if possible
+        if (typeof item.price === 'string') item.price = parseFloat(item.price);
+
+        const isValid = !isGhost && !isNaN(item.price) && item.name;
         return isValid;
     });
 

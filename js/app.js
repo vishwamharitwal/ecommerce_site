@@ -184,8 +184,13 @@ async function loadUserData(userId) {
         if (userData) {
             // Merge cloud data with local data
             if (userData.cart && userData.cart.length > 0) {
-                // Ghost Product Cleaner
-                cart = userData.cart.filter(item => item.name !== "RK Test Product" && item.price >= 0 && item.name);
+                // Ghost Product Cleaner (Robust)
+                cart = userData.cart.filter(item => {
+                    const name = (item.name || "").toLowerCase();
+                    const isGhost = name.includes("rk test") || name.includes("test product");
+                    const isValid = !isGhost && item.price !== undefined && item.name;
+                    return isValid;
+                });
 
                 safeSetLocalStorage('cart', cart);
                 updateCartCount();
