@@ -53,12 +53,30 @@ function loadCart() {
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
 
-    // --- FIX ISSUE 2: CLOUD SYNC ---
+    // UI Update: Immediately update header badge
+    updateHeaderBadge();
+
+    // Cloud Sync
     if (currentUser) {
         syncUserData(currentUser.uid, 'cart', cart)
             .then(() => console.log("☁️ Cart synced to cloud"))
             .catch(err => console.error("Sync failed:", err));
     }
+}
+
+// Helper: Update Header Badge directly
+function updateHeaderBadge() {
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    const els = ['cartCount', 'floatingCartCount'];
+
+    els.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = count;
+            if (count > 0) el.classList.add('badge-pulse');
+            else el.classList.remove('badge-pulse');
+        }
+    });
 }
 
 function renderCart() {

@@ -184,9 +184,17 @@ async function loadUserData(userId) {
         if (userData) {
             // Merge cloud data with local data
             if (userData.cart && userData.cart.length > 0) {
-                cart = userData.cart;
+                // Ghost Product Cleaner
+                cart = userData.cart.filter(item => item.name !== "RK Test Product" && item.price >= 0 && item.name);
+
                 safeSetLocalStorage('cart', cart);
                 updateCartCount();
+
+                // If cleaner ran, sync back to cloud immediately
+                if (cart.length !== userData.cart.length) {
+                    console.warn("🧹 Cleaned ghost items from Cloud Cart");
+                    syncUserData(userId, 'cart', cart);
+                }
             }
             if (userData.wishlist && userData.wishlist.length > 0) {
                 wishlist = userData.wishlist;
