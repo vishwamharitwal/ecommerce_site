@@ -5,6 +5,8 @@
 import { auth, db } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { syncUserData } from './db.js';
+import { sanitizeCart } from './utils.js';
 
 // Get Product ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -182,7 +184,7 @@ window.selectSize = (el, size) => {
 };
 
 // Cart Logic
-window.addToCart = function () {
+window.addToCart = async function () {
     console.log("Add to Cart Clicked");
     console.log("Current User:", currentUser);
     console.log("Product:", product);
@@ -259,14 +261,26 @@ window.addToCart = function () {
         });
     }
 
+    // Sanitize before saving (Backend Agent Logic)
+    cart = sanitizeCart(cart);
+
+    // Save Local
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartBadge();
     showToast(`${product.name} added to cart!`, 'success');
 
-    // Redirect to Cart Page after short delay
-    setTimeout(() => {
-        window.location.href = 'cart.html';
-    }, 1000);
+    // FORCE SYNC TO CLOUD (Critical Fix - Await Sync)
+    if (currentUser) {
+        try {
+            await syncUserData(currentUser.uid, 'cart', cart);
+            console.log('☁️ Cart synced successfully');
+        } catch (err) {
+            console.error('Sync failed:', err);
+        }
+    }
+
+    // Redirect to Cart Page
+    window.location.href = 'cart.html';
 };
 
 function updateCartBadge() {
