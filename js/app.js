@@ -394,6 +394,8 @@ function setupEventListeners() {
 // Render Products
 function renderProducts(productsToRender = products) {
     const grid = document.getElementById('productGrid');
+    if (!grid) return; // Guard clause for pages without product grid (e.g. Cart)
+
     grid.innerHTML = '';
 
     if (productsToRender.length === 0) {

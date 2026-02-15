@@ -1,5 +1,6 @@
 
-import { auth, onAuthStateChanged } from './firebase-config.js';
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { syncUserData } from './db.js';
 import { sanitizeCart } from './utils.js';
 
