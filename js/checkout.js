@@ -1,4 +1,5 @@
-import { auth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { auth } from './firebase-config.js';
 import { createOrder, fetchUserData, syncUserData } from './db.js';
 import { sanitizeCart, mergeCarts } from './utils.js';
 
