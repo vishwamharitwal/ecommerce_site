@@ -34,7 +34,17 @@
 
 <body class="bg-slate-100 text-slate-800 antialiased font-sans">
 
-    <div class="flex h-screen overflow-hidden">
+    <!-- Loading / Auth State -->
+    <div id="authLoading" class="fixed inset-0 flex items-center justify-center bg-slate-100 z-50">
+        <div class="text-center">
+            <div class="w-12 h-12 border-4 border-slate-300 border-t-slate-900 rounded-full animate-spin mx-auto mb-4">
+            </div>
+            <p class="text-slate-500 font-medium animate-pulse">Verifying Admin Access...</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden by default) -->
+    <div id="adminContent" class="flex h-screen overflow-hidden hidden">
 
         <!-- Sidebar -->
         <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-20 hidden md:flex">

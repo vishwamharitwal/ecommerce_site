@@ -15,23 +15,31 @@ const ADMIN_EMAILS = ['vishwamharitwal12@gmail.com'];
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
+        const loadingDiv = document.getElementById('authLoading');
+        const contentDiv = document.getElementById('adminContent');
+
         if (!user) {
             console.warn("🚫 Not Logged In. Redirecting...");
-            alert("Please Login First (Admin Check Failed)"); // Debug Alert
+            alert("Please Login First (Admin Check Failed)");
             window.location.href = '../index.html';
             return;
         }
 
-        console.log("👤 User Email:", user.email); // Debug Log
+        console.log("👤 User Email:", user.email);
 
         if (!ADMIN_EMAILS.includes(user.email)) {
             console.error("🚫 Access Denied for:", user.email);
-            alert(`Access Denied! You are logged in as: ${user.email}\nExpected: ${ADMIN_EMAILS.join(', ')}`);
+            alert("Access Denied: You do not have permission.");
             window.location.href = '../index.html';
             return;
         }
 
         console.log("🔓 Admin Access Granted:", user.email);
+
+        // Hide Loading, Show Dashboard
+        if (loadingDiv) loadingDiv.classList.add('hidden');
+        if (contentDiv) contentDiv.classList.remove('hidden');
+
         initDashboard();
     });
 });
