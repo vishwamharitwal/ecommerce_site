@@ -16,12 +16,17 @@ const ADMIN_EMAILS = ['vishwamharitwal12@gmail.com'];
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            window.location.href = '../index.html'; // Redirect to home if not logged in
+            console.warn("🚫 Not Logged In. Redirecting...");
+            alert("Please Login First (Admin Check Failed)"); // Debug Alert
+            window.location.href = '../index.html';
             return;
         }
 
+        console.log("👤 User Email:", user.email); // Debug Log
+
         if (!ADMIN_EMAILS.includes(user.email)) {
-            alert("Access Denied: Admins Only");
+            console.error("🚫 Access Denied for:", user.email);
+            alert(`Access Denied! You are logged in as: ${user.email}\nExpected: ${ADMIN_EMAILS.join(', ')}`);
             window.location.href = '../index.html';
             return;
         }
