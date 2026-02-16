@@ -2,12 +2,17 @@ import { auth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.
 import { createOrder, fetchUserData, syncUserData } from './db.js';
 import { sanitizeCart, mergeCarts } from './utils.js';
 
+console.log("🚀 Checkout Script Loaded");
+
 let currentUser = null;
 let cart = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 DOM Content Loaded");
+
     // 1. Auth Listener
     onAuthStateChanged(auth, async (user) => {
+        console.log("👤 Auth State Changed:", user ? user.uid : "Logged Out");
         currentUser = user;
         if (user) {
             // Hide Auth Warning
@@ -15,12 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fetch latest cart data
             const userData = await fetchUserData(user.uid);
             if (userData && userData.cart) {
+                console.log("☁️ Merging with Cloud Cart:", userData.cart.length);
                 // Merge logic (Security: Ensure we have latest cloud data)
                 const localCart = JSON.parse(localStorage.getItem('cart')) || [];
                 cart = mergeCarts(localCart, userData.cart);
                 renderOrderSummary();
+            } else {
+                console.log("☁️ No Cloud Cart found");
             }
         } else {
+            console.log("🚧 User Logged Out - Using Local Cart");
             // Show Auth Warning
             document.getElementById('authCheck').classList.remove('hidden');
             // Load local cart
@@ -34,11 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Setup Form Listener
     const payBtn = document.getElementById('payBtn');
     if (payBtn) {
+        console.log("✅ Pay Button Found");
         payBtn.addEventListener('click', handleCheckout);
+    } else {
+        console.error("❌ Pay Button NOT Found!");
     }
 });
 
 function renderOrderSummary() {
+    console.log("🛒 Rendering Summary. Items:", cart.length);
     const container = document.getElementById('cartItems');
     const subtotalEl = document.getElementById('subtotalDisplay');
     const totalEl = document.getElementById('totalDisplay');
@@ -49,8 +62,11 @@ function renderOrderSummary() {
         container.innerHTML = '<div class="text-center text-slate-400 py-4">Your cart is empty.</div>';
         subtotalEl.innerText = '$0.00';
         totalEl.innerText = '$0.00';
-        document.getElementById('payBtn').disabled = true;
-        document.getElementById('payBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        const payBtn = document.getElementById('payBtn');
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
         return;
     }
 
@@ -77,30 +93,38 @@ function renderOrderSummary() {
     totalEl.innerText = `$${subtotal.toFixed(2)}`;
 
     const payBtn = document.getElementById('payBtn');
-    payBtn.disabled = false;
-    payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
 }
 
 async function handleCheckout(e) {
     e.preventDefault();
+    console.log("🖱️ Pay Button Clicked");
 
     // 1. Validation
     if (!currentUser) {
+        console.warn("🚫 Login Required");
         alert("Please login to place an order.");
         window.location.href = 'index.html'; // Or show login modal if we had one here
         return;
     }
 
     if (cart.length === 0) {
+        console.warn("🚫 Cart Empty");
         alert("Your cart is empty!");
         return;
     }
 
     const form = document.getElementById('checkoutForm');
     if (!form.checkValidity()) {
+        console.warn("🚫 Form Invalid");
         form.reportValidity();
         return;
     }
+
+    console.log("✅ Validation Passed. Processing...");
 
     // 2. Collect Data
     const inputs = form.querySelectorAll('input, select');
@@ -147,7 +171,7 @@ async function handleCheckout(e) {
 
     if (result.success) {
         // Success
-        console.log("Order Placed:", result.orderId);
+        console.log("✅ Order Placed:", result.orderId);
 
         // Clear Local Cart
         localStorage.removeItem('cart');
@@ -160,6 +184,7 @@ async function handleCheckout(e) {
         setTimeout(() => successModal.classList.remove('opacity-0'), 10);
 
     } else {
+        console.error("❌ Order Failed:", result.error);
         alert("Order failed: " + result.error);
     }
 }

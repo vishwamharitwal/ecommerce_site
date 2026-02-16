@@ -71,31 +71,31 @@ export async function fetchUserData(userId) {
         console.error("Error fetching user data:", error);
         return null;
     }
-    // Checkout / Orders
-    export async function createOrder(userId, orderData) {
-        const ordersRef = collection(db, "orders");
-        const userRef = doc(db, "users", userId);
+}
+// Checkout / Orders
+export async function createOrder(userId, orderData) {
+    const ordersRef = collection(db, "orders");
+    const userRef = doc(db, "users", userId);
 
-        try {
-            // 1. Create Order Document
-            const orderDoc = await addDoc(ordersRef, {
-                userId: userId,
-                ...orderData,
-                createdAt: new Date().toISOString(),
-                status: 'pending'
-            });
+    try {
+        // 1. Create Order Document
+        const orderDoc = await addDoc(ordersRef, {
+            userId: userId,
+            ...orderData,
+            createdAt: new Date().toISOString(),
+            status: 'pending'
+        });
 
-            // 2. Clear User Cart (Optimistic UI update happen in frontend, but here we sync)
-            await updateDoc(userRef, {
-                cart: []
-            });
+        // 2. Clear User Cart (Optimistic UI update happen in frontend, but here we sync)
+        await updateDoc(userRef, {
+            cart: []
+        });
 
-            console.log("Order created successfully:", orderDoc.id);
-            return { success: true, orderId: orderDoc.id };
+        console.log("Order created successfully:", orderDoc.id);
+        return { success: true, orderId: orderDoc.id };
 
-        } catch (e) {
-            console.error("Error creating order:", e);
-            return { success: false, error: e.message };
-        }
+    } catch (e) {
+        console.error("Error creating order:", e);
+        return { success: false, error: e.message };
     }
 }
