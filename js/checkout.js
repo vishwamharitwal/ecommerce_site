@@ -11,6 +11,12 @@ let cart = [];
 document.addEventListener('DOMContentLoaded', () => {
     console.log("🚀 DOM Content Loaded");
 
+    // Reveal Main Content (Fix for global opacity: 0 style)
+    const main = document.querySelector('main');
+    if (main) {
+        setTimeout(() => main.classList.add('visible'), 100);
+    }
+
     // 1. Auth Listener
     onAuthStateChanged(auth, async (user) => {
         console.log("👤 Auth State Changed:", user ? user.uid : "Logged Out");
