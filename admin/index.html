@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - VOGUE</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0F172A',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-20 hidden md:flex">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800">
+                <span class="text-xl font-serif font-bold tracking-tight">VOGUE<span class="text-pink-500">.</span>
+                    Admin</span>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-lg text-white font-medium">
+                    <span class="material-icons text-pink-500">dashboard</span>
+                    Dashboard
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons">shopping_bag</span>
+                    Orders
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons">inventory_2</span>
+                    Products
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons">people</span>
+                    Customers
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800">
+                <button onclick="window.location.href='../index.html'"
+                    class="flex items-center gap-2 text-sm text-slate-400 hover:text-white w-full px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons text-lg">logout</span> Back to Store
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 relative">
+
+            <!-- Mobile Header -->
+            <header
+                class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 md:hidden">
+                <span class="font-serif font-bold text-lg">VOGUE Admin</span>
+                <button class="text-slate-500 hover:text-slate-800">
+                    <span class="material-icons">menu</span>
+                </button>
+            </header>
+
+            <!-- Scroll Area -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8">
+
+                <!-- Welcome -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
+                        <p class="text-slate-500 text-sm mt-1">Welcome back, <span id="adminName"
+                                class="font-medium text-slate-800">Admin</span></p>
+                    </div>
+                    <button
+                        class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-lg shadow-slate-900/10">
+                        <span class="material-icons text-sm">add</span> Add New Product
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Revenue -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-slate-500 text-sm font-medium">Total Revenue</span>
+                            <span
+                                class="material-icons text-green-500 bg-green-50 p-2 rounded-lg text-sm">attach_money</span>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900">$12,450.00</div>
+                        <div class="text-green-600 text-xs font-medium mt-2 flex items-center gap-1">
+                            <span class="material-icons text-xs">trending_up</span> +12% from last month
+                        </div>
+                    </div>
+
+                    <!-- Orders -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-slate-500 text-sm font-medium">New Orders</span>
+                            <span
+                                class="material-icons text-blue-500 bg-blue-50 p-2 rounded-lg text-sm">shopping_cart</span>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900">45</div>
+                        <div class="text-blue-600 text-xs font-medium mt-2 flex items-center gap-1">
+                            <span class="material-icons text-xs">access_time</span> 5 Pending Shipment
+                        </div>
+                    </div>
+
+                    <!-- Products -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-slate-500 text-sm font-medium">Products</span>
+                            <span
+                                class="material-icons text-purple-500 bg-purple-50 p-2 rounded-lg text-sm">inventory_2</span>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900">124</div>
+                        <div class="text-purple-600 text-xs font-medium mt-2 flex items-center gap-1">
+                            <span class="material-icons text-xs">warning</span> 3 Low Stock
+                        </div>
+                    </div>
+
+                    <!-- Customers -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-slate-500 text-sm font-medium">Customers</span>
+                            <span
+                                class="material-icons text-orange-500 bg-orange-50 p-2 rounded-lg text-sm">group</span>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-900">1,280</div>
+                        <div class="text-orange-600 text-xs font-medium mt-2 flex items-center gap-1">
+                            <span class="material-icons text-xs">trending_up</span> +5 new today
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <h2 class="font-bold text-slate-900">Recent Orders</h2>
+                        <button class="text-sm text-blue-600 font-medium hover:underline">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500">
+                                <tr>
+                                    <th class="px-6 py-4 font-medium">Order ID</th>
+                                    <th class="px-6 py-4 font-medium">Customer</th>
+                                    <th class="px-6 py-4 font-medium">Status</th>
+                                    <th class="px-6 py-4 font-medium">Total</th>
+                                    <th class="px-6 py-4 font-medium text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <!-- Example Row (Will be dynamic later) -->
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-slate-900">#ORD-001</td>
+                                    <td class="px-6 py-4 text-slate-600">Sarah Johnson</td>
+                                    <td class="px-6 py-4">
+                                        <span
+                                            class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Pending</span>
+                                    </td>
+                                    <td class="px-6 py-4 font-medium text-slate-900">$120.50</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-slate-400 hover:text-slate-800 transition-colors">
+                                            <span class="material-icons text-base">more_vert</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="../js/admin.js"></script>
+
+</body>
+
+</html>
