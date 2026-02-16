@@ -159,18 +159,70 @@ Text Light:  #0f172a  /* Slate 900 */
 Text Dark:   #f1f5f9  /* Slate 100 */
 ```
 
-## 📦 Features Roadmap
+## 📦 Features# 🚀 Fashion Store Roadmap (Full-Stack Architecture)
 
-- [ ] Product detail pages
-- [ ] Shopping cart page
-- [ ] Checkout process
-- [ ] User authentication
-- [ ] Backend integration
-- [ ] Payment gateway
-- [ ] Order tracking
-- [ ] Product reviews
-- [ ] Size guide modal
-- [ ] Quick view modal
+## 🔵 PHASE 1 – CORE INFRASTRUCTURE (The Foundation)
+- [x] **Firebase Setup**
+    - [x] Create Project & Enable Authentication (Google, Email/Password)
+    - [x] Enable Firestore & Storage
+    - [ ] Enable Cloud Functions (Pending)
+- [x] **Firestore Enterprise Schema**
+    - [x] `users` (uid, email, role, cartCount)
+    - [x] `products` (id, title, price, image, category)
+    - [ ] `inventory` (Separate from products for scalability)
+    - [x] `carts` (Synced via user profile)
+    - [ ] `orders`, `reviews`, `coupons`, `logs`
+- [ ] **Security Rules**
+    - [ ] Public read for products
+    - [ ] Only admin write products
+    - [ ] User can modify only their cart
+
+## 🟢 PHASE 2 – AUTHENTICATION SYSTEM
+- [x] **Google Sign In**
+- [x] **Email Signup/Login**
+- [x] **Session Persistence**
+- [x] **Auto Create User Document**
+- [ ] **Role Based Protection** (Protect `/admin` route)
+
+## 🟡 PHASE 3 – COMMERCE ENGINE (Revenue Core) - **CURRENT FOCUS**
+- [ ] **Cart System 2.0**
+    - [x] Cloud synced cart
+    - [x] Real-time cart badge update
+    - [x] Prevent ghost products (Sanitization)
+- [ ] **Checkout Flow**
+    - [ ] Refetch product prices (Backend Validation)
+    - [ ] Validate stock & Reserve stock
+    - [ ] Create Order Document
+    - [ ] Deduct Inventory & Clear Cart
+- [ ] **Order Management Logic**
+    - [ ] Status: pending -> confirmed -> shipped -> delivered
+
+## 🟣 PHASE 4 – ADMIN CONTROL PANEL
+- [ ] **Protected Route: /admin**
+- [ ] **Product CMS** (Create, Edit, Soft Delete, Upload WebP)
+- [ ] **Order Dashboard** (View all, Filter status, Revenue summary)
+- [ ] **Analytics** (Sales Graph, User Signups)
+
+## 🟠 PHASE 5 – CONVERSION ENGINEERING & UI
+- [ ] **Home Page Upgrade** (Hero Slider, Trending, New Arrivals)
+- [ ] **Engagement** (Newsletter Modal, Social Proof Toast, Wishlist)
+- [ ] **Revenue Boosters** (Recommendations, Urgency Counter)
+
+## 🔵 PHASE 6 – PERFORMANCE & SCALE
+- [ ] **Database Optimization** (Pagination limit 20, Composite indexes)
+- [ ] **Frontend Optimization** (Vite Migration, Lazy load images)
+
+## 🔴 PHASE 7 – SECURITY & FRAUD PREVENTION
+- [ ] **Server Side Price Validation**
+- [ ] **Inventory Isolation**
+
+## ⚫ PHASE 8 – DEVOPS & DEPLOYMENT
+- [ ] **GitHub Structure & CI/CD**
+- [x] **Deploy to Firebase Hosting/GitHub Pages**
+
+## ⚪ PHASE 9 – FUTURE SCALE ROADMAP
+- [ ] Migrate to Next.js
+- [ ] Advanced Features (Search, Multi-vendor)ck view modal
 
 ## 🤝 Contributing
 

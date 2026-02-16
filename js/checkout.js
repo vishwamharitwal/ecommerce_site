@@ -1,148 +1,165 @@
-// ==========================================
-// Checkout Logic
-// ==========================================
+import { auth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { createOrder, fetchUserData, syncUserData } from './db.js';
+import { sanitizeCart, mergeCarts } from './utils.js';
 
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// State
 let currentUser = null;
 let cart = [];
 
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-
-    // Auth Listener
-    onAuthStateChanged(auth, (user) => {
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Auth Listener
+    onAuthStateChanged(auth, async (user) => {
         currentUser = user;
-        checkAuthStatus();
+        if (user) {
+            // Hide Auth Warning
+            document.getElementById('authCheck').classList.add('hidden');
+            // Fetch latest cart data
+            const userData = await fetchUserData(user.uid);
+            if (userData && userData.cart) {
+                // Merge logic (Security: Ensure we have latest cloud data)
+                const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+                cart = mergeCarts(localCart, userData.cart);
+                renderOrderSummary();
+            }
+        } else {
+            // Show Auth Warning
+            document.getElementById('authCheck').classList.remove('hidden');
+            // Load local cart
+            const rawCart = localStorage.getItem('cart');
+            cart = rawCart ? JSON.parse(rawCart) : [];
+            cart = sanitizeCart(cart);
+            renderOrderSummary();
+        }
     });
 
-    loadCart();
-    setupEventListeners();
+    // 2. Setup Form Listener
+    const payBtn = document.getElementById('payBtn');
+    if (payBtn) {
+        payBtn.addEventListener('click', handleCheckout);
+    }
 });
 
-function checkAuthStatus() {
-    const authCheck = document.getElementById('authCheck');
-    const payBtn = document.getElementById('payBtn');
-
-    if (currentUser) {
-        authCheck.classList.add('hidden');
-        payBtn.disabled = false;
-        payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-
-        // Auto-fill mock data if needed or fetch from profile
-        // For now, let's keep form empty for user to fill
-    } else {
-        authCheck.classList.remove('hidden');
-        payBtn.disabled = true;
-        payBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    }
-}
-
-function loadCart() {
-    // Get local cart
-    const storedCart = localStorage.getItem('cart');
-    cart = storedCart ? JSON.parse(storedCart) : [];
-
-    const cartContainer = document.getElementById('cartItems');
+function renderOrderSummary() {
+    const container = document.getElementById('cartItems');
     const subtotalEl = document.getElementById('subtotalDisplay');
     const totalEl = document.getElementById('totalDisplay');
 
+    if (!container) return;
+
     if (cart.length === 0) {
-        cartContainer.innerHTML = `
-            <div class="text-center py-8">
-                <span class="material-icons text-slate-300 text-4xl mb-2">production_quantity_limits</span>
-                <p class="text-sm text-slate-500">Your cart is empty.</p>
-                <a href="index.html" class="text-primary text-xs font-bold underline mt-2 block">Go Shop</a>
+        container.innerHTML = '<div class="text-center text-slate-400 py-4">Your cart is empty.</div>';
+        subtotalEl.innerText = '$0.00';
+        totalEl.innerText = '$0.00';
+        document.getElementById('payBtn').disabled = true;
+        document.getElementById('payBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        return;
+    }
+
+    let subtotal = 0;
+    container.innerHTML = cart.map(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        return `
+            <div class="flex items-center gap-4 text-sm">
+                <div class="relative">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg border border-slate-100">
+                    <span class="absolute -top-2 -right-2 w-5 h-5 bg-slate-500 text-white text-xs flex items-center justify-center rounded-full">${item.quantity}</span>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-medium text-slate-900 dark:text-white line-clamp-1">${item.name}</h4>
+                    <p class="text-slate-500 text-xs">${item.selectedColor} / ${item.selectedSize}</p>
+                </div>
+                <div class="font-bold text-slate-700 dark:text-slate-300">$${itemTotal.toFixed(2)}</div>
             </div>
         `;
-        subtotalEl.textContent = '$0.00';
-        totalEl.textContent = '$0.00';
-        document.getElementById('payBtn').disabled = true;
-        return;
-    }
+    }).join('');
 
-    // Render Items
-    cartContainer.innerHTML = cart.map(item => `
-        <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-            <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
-                <img src="${item.image}" class="w-full h-full object-cover" alt="${item.name}">
-            </div>
-            <div class="flex-1 min-w-0">
-                <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">${item.name}</h4>
-                <p class="text-xs text-slate-500 truncate">${item.brand}</p>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="text-xs px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300 uppercase font-bold">${item.selectedSize}</span>
-                    <span class="w-3 h-3 rounded-full border border-slate-300" style="background-color: ${item.selectedColor}"></span>
-                    <span class="text-xs text-slate-400">Qty: ${item.quantity}</span>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-sm font-bold text-slate-900 dark:text-white">$${(item.price * item.quantity).toFixed(2)}</p>
-            </div>
-        </div>
-    `).join('');
+    subtotalEl.innerText = `$${subtotal.toFixed(2)}`;
+    totalEl.innerText = `$${subtotal.toFixed(2)}`;
 
-    // Calculate Totals
-    const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    subtotalEl.textContent = `$${total.toFixed(2)}`;
-    totalEl.textContent = `$${total.toFixed(2)}`;
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = false;
+    payBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 }
 
-function setupEventListeners() {
-    document.getElementById('payBtn').addEventListener('click', processPayment);
-}
+async function handleCheckout(e) {
+    e.preventDefault();
 
-async function processPayment() {
+    // 1. Validation
     if (!currentUser) {
-        alert('Please log in to continue.');
-        window.location.href = 'index.html';
+        alert("Please login to place an order.");
+        window.location.href = 'index.html'; // Or show login modal if we had one here
         return;
     }
 
-    // Validate Form (Basic)
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
     const form = document.getElementById('checkoutForm');
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
     }
 
-    // Show Loading
+    // 2. Collect Data
+    const inputs = form.querySelectorAll('input, select');
+    const addressData = {};
+    inputs.forEach(input => {
+        if (input.type !== 'checkbox') {
+            // For simplicity, using index or assume order triggers.
+            // Better to use name attributes.
+            // checkout.html inputs don't have name attributes!
+            // Let's use labels or assumptions for now as prototype.
+        }
+    });
+
+    // Mock Address for Verification Phase
+    const shippingAddress = {
+        firstName: inputs[0].value,
+        lastName: inputs[1].value,
+        email: document.getElementById('emailInput').value,
+        address: inputs[3].value,
+        city: inputs[4].value,
+        zip: inputs[5].value,
+        country: inputs[6].value
+    };
+
+    // 3. processing State
     const loadingOverlay = document.getElementById('loadingOverlay');
     loadingOverlay.classList.remove('hidden');
 
-    // Simulate Network Delay (2 seconds)
-    setTimeout(async () => {
+    // 4. Create Order (Backend)
+    const orderPayload = {
+        items: cart,
+        totalAmount: parseFloat(document.getElementById('totalDisplay').innerText.replace('$', '')),
+        shippingAddress: shippingAddress,
+        paymentMethod: 'Credit Card (Mock)',
+        paymentStatus: 'paid' // Mocking successful payment
+    };
 
-        // 1. Success! Clear Cart
+    // Simulate Network Delay (Payment Gateway)
+    await new Promise(r => setTimeout(r, 2000));
+
+    const result = await createOrder(currentUser.uid, orderPayload);
+
+    loadingOverlay.classList.add('hidden');
+
+    if (result.success) {
+        // Success
+        console.log("Order Placed:", result.orderId);
+
+        // Clear Local Cart
         localStorage.removeItem('cart');
+        cart = [];
 
-        // 2. Clear Cloud Cart (If we had backend sync)
-        if (currentUser) {
-            try {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, {
-                    cart: [] // Empty cart in DB
-                });
-            } catch (e) {
-                console.warn("Backend sync failed, but local cleared", e);
-            }
-        }
-
-        // 3. Hide Loading
-        loadingOverlay.classList.add('hidden');
-
-        // 4. Show Success Modal
+        // Show Success Modal
         const successModal = document.getElementById('successModal');
         successModal.classList.remove('hidden');
-        successModal.classList.remove('opacity-0'); // Fade in
-        successModal.querySelector('div').classList.remove('scale-90'); // Scale up
-        successModal.querySelector('div').classList.add('scale-100');
+        // Trigger animation
+        setTimeout(() => successModal.classList.remove('opacity-0'), 10);
 
-        // 5. Confetti Effect (Simple CSS or JS?)
-        // Let's stick to the modal for elegance.
-
-    }, 2500);
+    } else {
+        alert("Order failed: " + result.error);
+    }
 }
