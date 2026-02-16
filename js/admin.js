@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!user) {
             console.warn("🚫 Not Logged In. Redirecting...");
-            alert("Please Login First (Admin Check Failed)");
+            alert("Please log in to access this page.");
             window.location.href = '../index.html';
             return;
         }
